@@ -1,4 +1,4 @@
-Sinatra Asset Pipeline [![Build Status](https://travis-ci.org/kalasjocke/sinatra-asset-pipeline.svg?branch=master)](https://travis-ci.org/kalasjocke/sinatra-asset-pipeline) 
+Sinatra Asset Pipeline [![Build Status](https://travis-ci.org/kalasjocke/sinatra-asset-pipeline.svg?branch=master)](https://travis-ci.org/kalasjocke/sinatra-asset-pipeline)
 ======================
 
 An asset pipeline implementation for Sinatra based on [Sprockets](https://github.com/rails/sprockets). sinatra-asset-pipeline supports both compiling assets on the fly for development as well as precompiling assets for production. The design goal for sinatra-asset-pipeline is to provide good defaults for integrating your Sinatra application with Sprockets.
@@ -26,6 +26,13 @@ require 'sinatra/asset_pipeline/task'
 require './app'
 
 Sinatra::AssetPipeline::Task.define! App
+```
+
+Add a `manifest.js` file under `assets/config` with the following content.
+```js
+//= link_tree ../images
+//= link_directory ../javascripts .js
+//= link_directory ../stylesheets .css
 ```
 
 This makes your application serve assets inside `assets` folder under the public `/assets` path. You can use the helpers provided by [sprocket-helpers](https://github.com/petebrowne/sprockets-helpers) inside your assets to ease locating your assets.
@@ -68,11 +75,11 @@ However, if your application doesn't follow the defaults you can customize it as
 require 'sinatra/asset_pipeline'
 
 class App < Sinatra::Base
-  # Include these files when precompiling assets
-  set :assets_precompile, %w(app.js app.css *.png *.jpg *.svg *.eot *.ttf *.woff *.woff2)
+  # point to manifest file which specifies further assets (see https://github.com/rails/sprockets#directives) or simple asset files
+  set :assets_precompile, %w(manifest.js vendor.css)
 
-  # The path to your assets
-  set :assets_paths, %w(assets)
+  # The path to your manifest files or assets
+  set :assets_paths, %w(assets/config vendor/assets/css/)
 
   # Use another host for serving assets
   set :assets_host, '<id>.cloudfront.net'
@@ -91,7 +98,7 @@ class App < Sinatra::Base
 
   # Register the AssetPipeline extension, make sure this goes after all customization
   register Sinatra::AssetPipeline
-  
+
   # If you need more environments
   set :precompiled_environments, %i(staging uat production)
 

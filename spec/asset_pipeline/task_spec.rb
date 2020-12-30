@@ -6,7 +6,7 @@ describe Sinatra::AssetPipeline::Task do
   include_context "assets"
 
   before(:all) { Dir.chdir "spec" }
-  
+
   let(:json_manifest) do
     manifest_path = 'public/assets/.sprockets-manifest-*.json'
     globbed = Dir.glob(manifest_path)
@@ -22,6 +22,7 @@ describe Sinatra::AssetPipeline::Task do
 
     it "precompiles assets" do
       json_manifest["files"].each_key do |file|
+        next if file.start_with? "manifest"
         expect(File.exists?("public/assets/#{file}")).to be true
         expect(File.read("public/assets/#{file}")).to eq js_content  if file.end_with? '.js'
         expect(File.read("public/assets/#{file}")).to eq css_content if file.end_with? '.css'
